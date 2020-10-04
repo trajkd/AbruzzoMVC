@@ -1,0 +1,97 @@
+﻿<h1>Giulianova</h1>
+
+<script src="https://rawgit.com/allensarkisyan/VideoFrame/master/VideoFrame.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<div class="frame">
+    <span id="currentFrame">0</span>
+</div>
+<div class="video-container">
+    <video id="video" src="Content/GiulianovaDrone.mp4" controls></video>
+    <a href="#San-Flaviano" class="point">
+        <img src="Content/RedDot.svg" />
+    </a>
+</div>
+
+<script>
+    var track1 = {};
+    fetch("Content/track1.csv").then(a => a.text()).then(t => {
+        var trackcsv = t;
+        var lines = trackcsv.split("\n");
+        while (typeof lines[0] !== "undefined") {
+            var line = lines.shift();
+            var split = line.split(',');
+            track1[parseInt(split[0])] = [split[1], split[2]];
+        }
+    })
+
+    var track2 = {};
+    fetch("Content/track2.csv").then(a => a.text()).then(t => {
+        var trackcsv = t;
+        var lines = trackcsv.split("\n");
+        while (typeof lines[0] !== "undefined") {
+            var line = lines.shift();
+            var split = line.split(',');
+            track2[parseInt(split[0])] = [split[1], split[2]];
+        }
+    })
+
+    var track3 = {};
+    fetch("Content/track3.csv").then(a => a.text()).then(t => {
+        var trackcsv = t;
+        var lines = trackcsv.split("\n");
+        while (typeof lines[0] !== "undefined") {
+            var line = lines.shift();
+            var split = line.split(',');
+            track3[parseInt(split[0])] = [split[1], split[2]];
+        }
+    })
+
+    function videoDimensions(video) {
+        // Ratio of the video's intrisic dimensions
+        var videoRatio = video.videoWidth / video.videoHeight;
+        // The width and height of the video element
+        var width = video.offsetWidth, height = video.offsetHeight;
+        // The ratio of the element's width to its height
+        var elementRatio = width / height;
+        // If the video element is short and wide
+        if (elementRatio > videoRatio) width = height * videoRatio;
+        // It must be tall and thin, or exactly equal to the original ratio
+        else height = width / videoRatio;
+        return {
+            width: width,
+            height: height
+        };
+    }
+
+    var currentFrame = $('#currentFrame');
+    var video = VideoFrame({
+        id: 'video',
+        frameRate: 25,
+        callback: function (frame) {
+            currentFrame.html(frame);
+            var vid = document.getElementById("video");
+            if (frame in track1) {
+                $('.point').css("visibility", "visible");
+                $('.point').css("left", ((vid.offsetWidth - videoDimensions(vid).width) / 2 + parseFloat(track1[frame][0]) * videoDimensions(vid).width).toString() + "px");
+                $('.point').css("top", ((vid.offsetHeight - videoDimensions(vid).height) / 2 + videoDimensions(vid).height - parseFloat(track1[frame][1]) * videoDimensions(vid).height).toString() + "px");
+            } else {
+                if (frame in track2) {
+                    $('.point').css("visibility", "visible");
+                    $('.point').css("left", ((vid.offsetWidth - videoDimensions(vid).width) / 2 + parseFloat(track2[frame][0]) * videoDimensions(vid).width).toString() + "px");
+                    $('.point').css("top", ((vid.offsetHeight - videoDimensions(vid).height) / 2 + videoDimensions(vid).height - parseFloat(track2[frame][1]) * videoDimensions(vid).height).toString() + "px");
+                } else {
+                    if (frame in track3) {
+                        $('.point').css("visibility", "visible");
+                        $('.point').css("left", ((vid.offsetWidth - videoDimensions(vid).width) / 2 + parseFloat(track3[frame][0]) * videoDimensions(vid).width).toString() + "px");
+                        $('.point').css("top", ((vid.offsetHeight - videoDimensions(vid).height) / 2 + videoDimensions(vid).height - parseFloat(track3[frame][1]) * videoDimensions(vid).height).toString() + "px");
+                    } else {
+                        $('.point').css("visibility", "hidden");
+                    }
+                }
+            }
+        }
+    });
+    video.listen('frame');
+    console.log($('#video').width())
+</script>

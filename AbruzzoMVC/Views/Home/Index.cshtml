@@ -1,0 +1,44 @@
+﻿<main>
+    <div id='map' style='width: 90vw; height: 90vh;'></div>
+</main>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY2lhb2RlamFubWFyY28iLCJhIjoiY2tmNnJrcnNtMHp1bzJ5bm80bmYxOHVxOSJ9.3V8Wmw9ARa4d0rlY7GIjew';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom: 7,
+        center: [13.765, 42.290]
+    });
+
+    var geojson = {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [13.956686, 42.752517]
+            },
+            properties: {
+                title: 'Giulianova',
+                description: 'Scopri di più su questa località'
+            }
+        }]
+    };
+
+    // add markers to map
+    geojson.features.forEach(function (marker) {
+
+    // create a HTML element for each feature
+    var el = document.createElement('div');
+    el.className = 'marker';
+
+    el.addEventListener('click', function (e) {
+        window.location.href = "/" + marker.properties.title;
+    });
+
+    // make a marker for each feature and add to the map
+    new mapboxgl.Marker(el)
+        .setLngLat(marker.geometry.coordinates)
+        .addTo(map);
+    });
+</script>
